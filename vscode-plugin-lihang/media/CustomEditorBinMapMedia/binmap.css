@@ -1,0 +1,46 @@
+body {
+	justify-content: center;
+	align-items: center;
+	margin: 1em 2em;
+}
+
+
+.add-button {
+	height: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+
+table {  
+	width: 100%;
+	padding: 8px;   
+}  
+table, th, td {  
+    border: 1px solid black; /* 设置边框为1px的黑色实线 */  
+    border-collapse: collapse; /* 合并相邻的边框 */  
+}
+
+th, td {  
+    background-color:slategray; /* 设置表头背景色 */  
+    text-align: left; /* 设置表头文本左对齐 */  
+    padding: 8px; /* 设置表头内边距 */  
+}
+
+th:last-child, td:last-child {  
+	width: 40%; /* 你可以根据需要调整这个值 */
+}
+
+.add-button{
+	position: fixed;
+	left: 0;
+	bottom: 0;
+}
+
+.input-error {
+    border: 2px solid red !important;
+    box-shadow: none !important;
+    outline: none !important;
+    border-radius: 4px;   /* 可以选，视觉更好看 */
+}

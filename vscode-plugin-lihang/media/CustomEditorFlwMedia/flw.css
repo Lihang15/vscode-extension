@@ -1,0 +1,23 @@
+
+#page{
+    display: flex;
+    justify-content: space-between;
+}
+#canvas{
+   width: 75%;
+   height: 900px;
+   border: solid 1px rgb(224, 214, 214);
+   /* overflow: auto; /* 防止内容溢出 */  
+   /* transform-origin: top left; /* 缩放的起点 */  
+
+}
+
+#property{
+   width: 25%;
+   /* height: 900px; */
+   border: solid 1px rgb(224, 214, 214);
+}
+
+#property #desc{
+   margin-bottom: 20px;
+}

@@ -1,0 +1,22 @@
+{
+  "nodes": [
+    {
+      "type": "runBranchNode",
+      "text": "Test99",
+      "Branchs": [
+        {
+          "branch": "Pass",
+          "nodes": []
+        },
+        {
+          "branch": "Fail",
+          "nodes": []
+        }
+      ]
+    },
+    {
+      "type": "runNode",
+      "text": "Test100"
+    }
+  ]
+}

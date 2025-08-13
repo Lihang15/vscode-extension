@@ -1,0 +1,84 @@
+{
+    "name": "sts8600document",
+    "displayName": "sts8600document",
+    "description": "[ctrl+shift+p] 找到Sts8600-Help 或 [文本聚焦后ctrl+8] 打开帮助文档",
+    "version": "1.0.0",
+    "publisher": "lihang",
+    "engines": {
+      "vscode": "^1.93.0"
+    },
+    "icon": "media/cat.jpg",
+    "categories": [
+      "Other"
+    ],
+    "activationEvents": [
+      "*"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+      "commands": [
+        {
+          "command": "extension.Sts8600-Help",
+          "title": "Sts8600-Help"
+        },
+        {
+          "command": "extension.keybinding",
+          "title": "is keybindings"
+        },
+        {
+          "command": "extension.Sts8600-Help.goOnline",
+          "title": "Sts8600-Help goOnline"
+        },
+        {
+          "command": "extension.Sts8600-Help.goOffline",
+          "title": "Sts8600-Help goOffline"
+        }
+      ],
+      "keybindings": [
+        {
+          "command": "extension.Sts8600-Help",
+          "key": "ctrl+8",
+          "mac": "cmd+8",
+          "when": "editorTextFocus"
+        }
+      ],
+      "configuration": {
+        "title": "Sts8600-Help Config",
+        "properties": {
+          "Sts8600Help.settings.port": {
+            "type": [
+              "number"
+            ],
+            "default": 41730,
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "Set Custom Port Number of Live Server. Set 0 if you want random port."
+          }
+        }
+      }
+    },
+    "scripts": {
+      "vscode:prepublish": "npm run compile",
+      "compile": "tsc -p ./",
+      "watch": "tsc -watch -p ./",
+      "pretest": "npm run compile && npm run lint",
+      "lint": "eslint src --ext ts",
+      "test": "vscode-test"
+    },
+    "devDependencies": {
+      "@types/express": "^4.17.21",
+      "@types/vscode": "^1.93.0",
+      "@types/mocha": "^10.0.7",
+      "@types/node": "20.x",
+      "@typescript-eslint/eslint-plugin": "^8.3.0",
+      "@typescript-eslint/parser": "^8.3.0",
+      "eslint": "^9.9.1",
+      "typescript": "^5.5.4",
+      "@vscode/test-cli": "^0.0.10",
+      "@vscode/test-electron": "^2.4.1"
+    },
+    "dependencies": {
+      "express": "^4.19.2"
+    }
+  }
+  

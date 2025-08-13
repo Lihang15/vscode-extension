@@ -1,0 +1,168 @@
+Timings {
+	WaveformTables {
+		WaveformTable DC_DDR0_wvt [x1][] {
+			Signal CBIT_I_CLK + CBIT_I_DDR_CLK {
+				1: d1:U;
+				X: d1:Z d2:X;
+				0: d1:D;
+				H: d1:Z r1:H;
+				L: d1:Z r1:L;
+				h: d1:Z r2:H;
+				l: d1:z r2:L;
+				Break: L;
+			}
+			Signal CBIT_I_ETH_REFCLK {
+				0: d1:D;
+			}
+			Signal CBIT_I_PE0_CLK0 {
+				0: d1:U;
+			}
+			Signal CBIT_I_PE0_CLK1 {
+				1: d1:U d3:D; p: d2:U d4:D;
+			}
+			Signal USR_D_5V_A {
+				L: r1:L;
+				H: r1:H;
+				X: r1:X;
+				l: r2:L;
+				h: r2:H;
+			}
+		}
+		WaveformTable DC_DDR0_wvt_test [X4] {
+			Signal O_TDO {
+				L: r1:L;
+				H: r1:H;
+				X: r1:X;
+				l: r2:L;
+				h: r2:H;
+				Break:LLLL;
+				Used {
+					L H L H;
+					L l H H;
+					H H L L;
+					[L H X] [L H X] [L H X] [L H X];
+				}
+				Unused {
+					LHLH;
+					LlHH;
+					HHLL;
+					//[L H X] [L H X] [L H X] [L H X];
+				}
+				Map {
+					X [L H] X [L H] => X X X X;
+					X [l h] X [l h] => X X X X;
+				}
+			}
+		}
+	}
+	EquationSets {
+		EquationSet DC_DDR0_eqn {
+			SpecVars {
+				Double Tcoef;
+				Time Roff;
+				Time per_125;
+			}
+			TimingSets {
+				TimingSet gen_tp1 [(per_125)*Tcoef] {
+					Signal CBIT_I_CLK + CBIT_I_DDR_CLK{
+						d1 = ((0/125) * per_125) * Tcoef;
+						r1 = ((100/125) * per_125) * Tcoef + Roff;
+						r2 = ((106/125) * per_125) * Tcoef + Roff;
+					}
+					Signal CBIT_I_ETH_REFCLK + CBIT_I_PE0_CLK1{
+						d1 = ((30 / 125) * per_125) * Tcoef;
+						d2 = ((31 / 125) * per_125) * Tcoef;
+						d3 = ((90 / 125) * per_125) * Tcoef;
+						d4 = ((93 / 125) * per_125) * Tcoef;
+					}
+					Signal CBIT_I_PE0_CLK0 {
+						d1 = ((0/125)*per_125)*Tcoef;
+					}
+					Signal USR_D_5V_A {
+						r1 = ((100/125)*per_125)*Tcoef + Roff;
+						r2 = ((106/125)*per_125)*Tcoef + Roff;
+					}
+				}
+				TimingSet gen_tp2 [(per_125)*Tcoef] {
+					Signal CBIT_I_PE0_CLK0 {
+						d1 = ((0/125)*per_125)*Tcoef;
+					}
+				}
+			}
+		}
+		EquationSet DC_DDR0_CLK_eqn {
+			SpecVars{
+				Double Tcoef;
+				Time Roff;
+				Time per_125;
+			}
+			TimingSets {
+				TimingSet gen_tp1 [(per_125)*Tcoef] {
+					Signal CBIT_I_CLK + CBIT_I_DDR_CLK{
+						d1 = ((0/125)*per_125)*Tcoef;
+						r1 = ((100/125)*per_125)*Tcoef + Roff;
+						r2 = ((106/125)*per_125)*Tcoef + Roff;
+					}
+					Signal CBIT_I_ETH_REFCLK + CBIT_I_PE0_CLK1 {
+						d1 = ((30/125)*per_125)*Tcoef;
+						d2 = ((31/125)*per_125)*Tcoef;
+						d3 = ((90/125)*per_125)*Tcoef;
+						d4 = ((93/125)*per_125)*Tcoef;
+					}
+					Signal CBIT_I_PE0_CLK0 {
+						d1 = ((0/125)*per_125)*Tcoef;
+					}
+					Signal USR_D_5V_A {
+						r1 = ((100/125)*per_125)*Tcoef + Roff;
+						r2 = ((106/125)*per_125)*Tcoef + Roff;
+					}
+				}
+				TimingSet gen_tp2 [(per_125)*Tcoef] {
+					Signal CBIT_I_PE0_CLK0{
+						d1 =((0/125)*per_125)*Tcoef;
+					}
+				}
+			}
+		}
+	}
+	SpecificationSets {
+		SpecificationSet DC_DDR0_spec {
+			SpecVars {
+				Tcoef = 1;
+				Roff = 0 ns;
+				per_125 = 125 ns;
+			}
+			Ports [pDDR0,pDDR_clk,pDDR2,pDDR3,pDDR4] {
+				SpecVars pDDR_clk [DC_DDR0_wvt] [DC_DDR0_clk_eqn] {}
+				SpecVars pDDR0 [DC_DDR0_wvt] [DC_DDR0_eqn] {
+					per_125 = 120 ns;
+				}
+			}
+		}
+		SpecificationSet DC_DDR0_spec_test {
+			SpecVars {
+				Tcoef = 1;
+				Roff = 0 ns;
+			}
+			Ports [pDDR0,pDDR_clk] {
+				SpecVars pDDR0 [DC_DDR0_wvt] [DC_DDR0_eqn] {
+					per_125 = 125 ns;
+				}
+				SpecVars pDDR_clk [DC_DDR0_wvt] [DC_DDR0_eqn] {
+					per_125 = 125 ns;
+				}
+			}
+		}
+		SpecificationSet SinglePort_spec {
+			SpecVars {
+				Tcoef = 1;
+				Roff = 0 ns;
+			}
+			Ports [/@] {
+				SpecVars @ [DC_DDR0_wvt] [DC_DDR0_eqn] {
+					per_125 = 125 ns;
+				}
+			}
+		}
+	}
+}

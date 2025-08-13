@@ -1,0 +1,182 @@
+{
+  "name": "custom-editors",
+  "displayName": "custom-editor",
+  "description": "自定义.flw/.binmap结尾文件成视图编辑器",
+  "version": "1.0.0",
+  "publisher": "lihang",
+  "engines": {
+    "vscode": "^1.87.0"
+  },
+  "icon": "media/cat.jpg",
+  "repository": {},
+
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "extension_config",
+      "properties": {
+        "config.yourName": {
+          "type": "string",
+          "default": "lihang",
+          "description": "你的名字"
+        },
+        "config.showWelcome": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否启动欢迎页"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "javascript",
+        "path": "./src/snippets/javascript.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "helloworld.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "extension.handleDiagnosticClick",
+        "title": "Handle Diagnostic Click"
+      },
+      {
+        "command": "extension.openFileInWebview",
+        "title": "openFileInWebview"
+      },
+      {
+        "command": "extension.getCurrentFilePath",
+        "title": "extension get file or dir path",
+        "icon": {
+          "light": "./images/tool-light.svg",
+          "dark": "./cat.jpg"
+        }
+      },
+      {
+        "command": "extension.isJsFile",
+        "title": "is js file"
+      },
+      {
+        "command": "extension.keybinding",
+        "title": "is keybindings"
+      },
+      {
+        "command": "extension.generateTestTemplate",
+        "title": "Generate Test Template"
+      },
+      {
+        "command": "extension.praise",
+        "title": "I have a word of praise..start"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "extension.getCurrentFilePath",
+          "group": "navigation"
+        },
+        {
+          "when": "editorHasSelection",
+          "command": "extension.praise",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "extension.getCurrentFilePath",
+          "group": "navigation"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "when": "resourceLangId == javascript",
+          "command": "extension.isJsFile",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "extension.keybinding",
+        "key": "ctrl+f1",
+        "mac": "cmd+f1",
+        "when": "editorTextFocus"
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "Customs.BinMap",
+        "displayName": "BinMap",
+        "selector": [
+          {
+            "filenamePattern": "*.binmap"
+          }
+        ]
+      },
+      {
+        "viewType": "Customs.Flw",
+        "displayName": "Flw",
+        "selector": [
+          {
+            "filenamePattern": "*.flw"
+          }
+        ]
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cat",
+          "title": "自定义树视图",
+          "icon": "media/cat.svg"
+        }
+      ]
+    },
+    "views": {
+      "cat": [
+        {
+          "id": "big cat",
+          "name": "大猫"
+        },
+        {
+          "id": "small cat",
+          "name": "小猫"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.87.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "@vscode/test-cli": "^0.0.6",
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "fs-extra": "^11.2.0"
+  }
+}
