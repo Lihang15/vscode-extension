@@ -106,7 +106,7 @@ connection.onInitialized(() => {
 			connection.console.log('Workspace folder change event received.');
 		});
 	}
-  	// ✅ 初始化后，异步扫描一次
+  	//  初始化后，扫描一次
   scanAndValidateWorkspace()
 });
 // 2️⃣ 主动扫描工作区文件并诊断
@@ -131,13 +131,13 @@ async function walkAndValidate(dir: string, exts: string[]) {
           const content = await fs.promises.readFile(fullPath, 'utf-8');
           const diagnostics = await validateTextContent(content, fullPath);
 
-          // ✅ 主动推送诊断
+          // 主动推送诊断
           connection.sendDiagnostics({
             uri: URI.file(fullPath).toString(),
             diagnostics
           });
         } catch (err) {
-          console.error(`❌ 读取文件出错: ${fullPath}`, err);
+          console.error(`读取文件出错: ${fullPath}`, err);
         }
       }
     }
@@ -293,7 +293,7 @@ documents.onDidClose(e => {
 // 	return diagnostics;
 // }
 
-// 3️⃣ 诊断逻辑（可以共用）
+// 3诊断逻辑（可以共用）
 async function validateTextContent(text: string, filePath: string): Promise<Diagnostic[]> {
   let diagnostics: Diagnostic[] = [];
 
@@ -328,7 +328,7 @@ async function validateTextContent(text: string, filePath: string): Promise<Diag
     });
   }
 
-  // 👉 检查括号匹配
+  // 检查括号匹配
   const bracketPairs: { [open: string]: string } = { '{': '}', '[': ']', '(': ')' };
   const openStack: { char: string; index: number }[] = [];
   for (let i = 0; i < text.length; i++) {
@@ -369,7 +369,7 @@ async function validateTextContent(text: string, filePath: string): Promise<Diag
 }
 
 
-// 4️⃣ 打开文件 & 修改文件时，实时诊断
+// 4打开文件 & 修改文件时，实时诊断
 documents.onDidChangeContent(change => {
   validateTextContent(change.document.getText(), URI.parse(change.document.uri).fsPath)
     .then(diagnostics => {

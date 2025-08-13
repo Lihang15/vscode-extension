@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { EditorBinMapProvider } from './provider/CustomEditorBinMapProvider/EditorBinMapProvider';
 import { EditorFlwProvider } from './provider/CustomEditorFlwProvider/EditorFlwProvider';
-import { webviewDisposable } from './WebView';
+import { webviewDisposable } from './power/WebView';
 import MyFileTreeProvider from './CustomTreeProvider';
 
 
