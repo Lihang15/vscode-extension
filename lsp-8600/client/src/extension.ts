@@ -49,7 +49,7 @@ export function activate(context: ExtensionContext) {
 		documentSelector: [{ scheme: 'file', language: 'flow' },{ scheme: 'file', language: 'signal' },{ scheme: 'file', language: 'tim' },{ scheme: 'file', language: 'binmap' }],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/.{clientrc,tim,binmap}')
+			fileEvents: workspace.createFileSystemWatcher('**/.{clientrc,tim,binmap,flow,signal}')
 		}
 	};
 

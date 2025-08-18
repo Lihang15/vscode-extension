@@ -1,0 +1,61 @@
+{
+"If Statement": {
+    "prefix": "if",
+    "body": [
+      "if (${1:condition}) {",
+      "  $0",
+      "}"
+    ],
+    "description": "If statement"
+  },
+
+  "Signal Block": {
+    "prefix": "Signal",
+    "body": [
+      "SiteCount 1;",
+      "",
+      "Signal ${1:CBIT_I_CLK} {",
+      "    ResType ${2:CBIT-System};",
+      "    Enable ${3:true};",
+      "    Site 1 {",
+      "        Channel = ${4:0,24};",
+      "    }",
+      "}",
+      "",
+      "Signal ${5:CBIT_I_DDR_CLK} {",
+      "    ResType: ${6:CBIT-System};",
+      "    Enable: ${7:true};",
+      "    Site 1 {",
+      "        Channel = ${8:0,4};",
+      "    }",
+      "}",
+      "",
+      "Signal ${9:CBIT_I_ETH_REFCLK} {",
+      "    ResType ${10:CBIT-System};",
+      "    Enable ${11:true};",
+      "    Site 1 {",
+      "        Channel = ${12:0,6};",
+      "    }",
+      "}",
+      "",
+      "Signal ${13:CBIT_I_PE0_CLK0} {",
+      "    ResType ${14:CBIT-System};",
+      "    Enable ${15:true};",
+      "    Site 1 {",
+      "        Channel = ${16:0,7};",
+      "    }",
+      "}",
+      "",
+      "SignalGroups ${17:gGANG} {",
+      "    ResType ${18:DPS-DPS256};",
+      "    Signal ${19:VDD_DDR_0P75,VDD_ECSERDES_0P75,VDDH_SERDES_1P8,VDDIO_1_1P8,VDDIO_1_3P3};",
+      "}",
+      "",
+      "ExecuteNodes"
+    ],
+    "description": "Insert signal, signal group and port definitions"
+  }
+
+
+
+} 

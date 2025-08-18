@@ -10,7 +10,7 @@
 	},
 	"publisher": "lihang",
     "icon": "client/icons/芯片.png",
-	"categories": [],
+	"categories": ["Snippets"],
 	"keywords": [
 		"multi-root ready"
 	],
@@ -21,6 +21,7 @@
 		"onStartupFinished"
 	],
 	"main": "./client/out/extension",
+
 	"contributes": {
 		"languages": [
 			{
@@ -36,7 +37,7 @@
 					"dark": "./client/icons/flow.svg",
 					"light": "./client/icons/flow-icon.svg"
 				},
-				"configuration": "./client/language/language-configuration.json"
+				"configuration": "./client/language/language-flow-configuration.json"
 			},
 			{
 				"id": "signal",
@@ -51,7 +52,7 @@
 					"dark": "./client/icons/general-icon.svg",
 					"light": "./client/icons/general-icon.svg"
 				},
-				"configuration": "./client/language/language-configuration.json"
+				"configuration": "./client/language/language-signal-configuration.json"
 			},
 			{
 				"id": "binmap",
@@ -81,7 +82,7 @@
 					"dark": "./client/icons/tim.svg",
 					"light": "./client/icons/tim.svg"
 				},
-				"configuration": "./client/language/language-configuration.json"
+				"configuration": "./client/language/language-tim-configuration.json"
 			}
 		],
 		"grammars": [
@@ -103,16 +104,16 @@
 		],
 		"snippets": [
 			{
-				"language": "flow",
-				"path": "./client/snippets/general.json"
+				"language": "javascript",
+				"path": "./client/snippets/flow.json"
 			},
 			{
 				"language": "signal",
-				"path": "./client/snippets/general.json"
+				"path": "./client/snippets/signal.json"
 			},
 			{
 				"language": "tim",
-				"path": "./client/snippets/general.json"
+				"path": "./client/snippets/tim/tim.json"
 			}
 		],
 		"configuration": {

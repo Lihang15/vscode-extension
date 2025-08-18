@@ -1,0 +1,70 @@
+{
+  "If Statement": {
+    "prefix": "if",
+    "body": [
+      "if (${1:condition}) {",
+      "  $0",
+      "}"
+    ],
+    "description": "If statement"
+  },
+  "For Loop": {
+    "prefix": "for",
+    "body": [
+      "for (${1:i} = 0; ${1:i} < ${2:count}; ${1:i}++) {",
+      "  $0",
+      "}"
+    ],
+    "description": "For loop"
+  },
+   "Flow Block": {
+    "prefix": "Flow",
+    "body": [
+      "Flow {",
+      "    Comment: \"${1:MainFlow}\";",
+      "    Nodes {",
+      "        TestSuite ${2:Test_1}  {   // CustomTestMethod为关联的测试方法",
+      "            Calls ${3:CustomTestMethod};",
+      "            Comment = \"${4:This is a test node}\";",
+      "            Flags = {",
+      "                ByPass = false;",
+      "            };",
+      "            ExecutionMode = \"Normal\";",
+      "            PrimarySettings {",
+      "                Timing.TimingSpecificationSet = \"${5:timingSpecificationSet_1}\";",
+      "                Timing.Ports[${6:port_1}].TimingSet = \"${7:timingSet_1}\";",
+      "                Level.LevelEquationSet = \"${8:levelEquationSet_1}\";",
+      "                Level.LevelSet = \"${9:levelSet_1}\";",
+      "                Pattern = \"${10:multiPortBurst_1}\";",
+      "            }",
+      "            TestMethodParameters {",
+      "                DoubleParameter = \"${11:1.23}\";",
+      "                IntParameter = \"${12:123}\";",
+      "                BoolParameter = \"${13:true}\";",
+      "                StringParameter = \"${14:This is a string}\";",
+      "            };",
+      "        }",
+      "    }",
+      "    ExecuteNodes {",
+      "        Run(${15:Test_1});",
+      "        RunBranch(${16:Test_2}){",
+      "            ${17:Test_3};",
+      "        }",
+      "        else(",
+      "            ${18:Test_4}",
+      "        )",
+      "        Concurrent1{",
+      "            ${19:Flow1};",
+      "            ${20:Flow2};",
+      "        }",
+      "        TestMethod{",
+      "            ",
+      "        }",
+      "    }",
+      "}"
+    ],
+    "description": "Insert a full Flow structure"
+  }
+
+
+} 
