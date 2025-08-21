@@ -22,16 +22,16 @@ export function activate(context: ExtensionContext) {
 	const serverModule = context.asAbsolutePath(
 		path.join('server', 'out', 'server.js')
 	);
-	 vscode.languages.onDidChangeDiagnostics((e) => {
-        const diagnostics = vscode.languages.getDiagnostics();
+	//  vscode.languages.onDidChangeDiagnostics((e) => {
+    //     const diagnostics = vscode.languages.getDiagnostics();
 
-        // 示例：提取当前文件的诊断
-        const currentFile = vscode.window.activeTextEditor?.document.uri;
-        const currentDiagnostics = currentFile ? vscode.languages.getDiagnostics(currentFile) : [];
+    //     // 示例：提取当前文件的诊断
+    //     const currentFile = vscode.window.activeTextEditor?.document.uri;
+    //     const currentDiagnostics = currentFile ? vscode.languages.getDiagnostics(currentFile) : [];
 
-      console.log(currentDiagnostics);
+    //   console.log(currentDiagnostics);
 	  
-    });
+    // });
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used

@@ -18,7 +18,8 @@
 		"vscode": "^1.75.0"
 	},
 	"activationEvents": [
-		"onStartupFinished"
+		"onStartupFinished",
+		"onLanguage:tim"
 	],
 	"main": "./client/out/extension",
 
@@ -88,23 +89,23 @@
 		"grammars": [
 			{
 				"language": "flow",
-				"scopeName": "source.general",
-				"path": "./client/syntaxes/general.tmLanguage.json"
+				"scopeName": "source.flow",
+				"path": "./client/syntaxes/flow.tmLanguage.json"
 			},
 			{
 				"language": "signal",
-				"scopeName": "source.general",
-				"path": "./client/syntaxes/general.tmLanguage.json"
+				"scopeName": "source.signal",
+				"path": "./client/syntaxes/signal.tmLanguage.json"
 			},
 			{
 				"language": "tim",
-				"scopeName": "source.general",
-				"path": "./client/syntaxes/general.tmLanguage.json"
+				"scopeName": "source.tim",
+				"path": "./client/syntaxes/tim.tmLanguage.json"
 			}
 		],
 		"snippets": [
 			{
-				"language": "javascript",
+				"language": "flow",
 				"path": "./client/snippets/flow.json"
 			},
 			{
@@ -113,7 +114,7 @@
 			},
 			{
 				"language": "tim",
-				"path": "./client/snippets/tim/tim.json"
+				"path": "./client/snippets/tim.json"
 			}
 		],
 		"configuration": {

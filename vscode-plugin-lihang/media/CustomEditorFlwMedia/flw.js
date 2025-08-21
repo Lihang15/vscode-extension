@@ -28,6 +28,7 @@ class TestFlowEditor {
     }
     // 创建app（也就是画布）
     async createApp() {
+        console.log('*******************')
         const app = new PIXI.Application();
         d3SvgApp=app
         // Intialize the application.

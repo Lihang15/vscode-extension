@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Signal DSL",
+  "scopeName": "source.signal",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#parameters"
+    },
+     {
+      "include": "#variable"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.dsl",
+          "begin": "/\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "comment.line.double-slash.dsl",
+          "match": "//.*$"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.dsl",
+          "match": "\\b(Timings|WaveformTables|WaveformTable|Signal|EquationSets|EquationSet|TimingSets|TimingSet|SpecificationSets|SpecificationSet|SpecVars|Ports|Used|Unused|Map|Flow)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.dsl",
+          "match": "\\b(Double|Time)\\b"
+        }
+      ]
+    },
+    "parameters": {
+      "patterns": [
+        {
+          "name": "variable.parameter.dsl",
+          "match": "\\b(d[0-9]+|r[0-9]+|p)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.dsl",
+          "match": "\\b\\d+(\\.\\d+)?(\\s*ns)?\\b"
+        }
+      ]
+    },
+    "variable": {
+      "patterns": [
+        {
+          "name": "variable.numeric.dsl"
+        }
+      ]
+    }
+  }
+}

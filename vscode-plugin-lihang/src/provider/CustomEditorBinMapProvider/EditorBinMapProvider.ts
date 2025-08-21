@@ -24,6 +24,8 @@ export class EditorBinMapProvider implements vscode.CustomTextEditorProvider {
 
 	private static readonly viewType = 'Customs.BinMap';
 
+	private dslDocument: any = {};
+
 
 	constructor(
 		private readonly context: vscode.ExtensionContext
@@ -45,9 +47,9 @@ export class EditorBinMapProvider implements vscode.CustomTextEditorProvider {
 		};
 		webviews.set('webview-binmap',webviewPanel)
 		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
-
-		function updateWebview() {
-			console.log('Message:', );
+		this.dslDocument = JSON.parse(document.getText());
+		const updateWebview = ()=> {
+			// console.log('Messagexxxx:',this.dslDocument);
 			// vscode.languages.onDidChangeDiagnostics((e) => {
 			// 	// const diagnostics = vscode.languages.getDiagnostics();
 
@@ -104,6 +106,7 @@ export class EditorBinMapProvider implements vscode.CustomTextEditorProvider {
 			if (e.document.uri.toString() === document.uri.toString()) {
 				// 避免文本变更，没有拿到诊断，ui刷新不了诊断
 				 setTimeout(() => updateWebview(), 300);
+				 
 			}
 		});
 
@@ -290,7 +293,6 @@ export class EditorBinMapProvider implements vscode.CustomTextEditorProvider {
     }
     let end = Date.now();
 	console.log(`webview->postmessage->nodejs->编辑表格1行计算的时间: ${end - start} ms`);
-
     return this.updateTextDocument(document, json);
 
    
@@ -332,6 +334,7 @@ export class EditorBinMapProvider implements vscode.CustomTextEditorProvider {
 
 			let end = Date.now();
 		console.log(`文本全部替换执行的时间: ${end - start} ms`);
+		this.dslDocument = json
 		return vscode.workspace.applyEdit(edit);
 		
 	}

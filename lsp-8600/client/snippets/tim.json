@@ -173,7 +173,7 @@
       "}"
     ],
     "description": "Insert complete Timings block",
-      "scope": "tim"
+    "scope": "tim"
   }
 
 
