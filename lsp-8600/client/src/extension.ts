@@ -68,6 +68,10 @@ export function activate(context: ExtensionContext) {
       { language: 'flow' }, // 你的语言 ID
       provider
     ),
+	  vscode.languages.registerInlineCompletionItemProvider(
+      { language: 'tim' }, // 你的语言 ID
+      provider
+    ),
 	vscode.languages.registerInlineCompletionItemProvider(
       { language: 'signal' }, // 你的语言 ID
       provider

@@ -37,11 +37,15 @@ import { URI } from 'vscode-uri';
 import * as fs from 'fs';
 import * as path from 'path';
 // import { CharStream, CommonTokenStream, ParseTreeWalker }  from 'antlr4';
-import TimingLangLexer from './antrl/dsl/TimingLang/TimingLangLexer';
-import TimingLangParser from './antrl/dsl/TimingLang/TimingLangParser';
-import { TimingBlockVisitor } from './antrl/dsl/TimingLang/CustomVisitors/BlockVisitors';
-import { LspErrorListener } from './antrl/dsl/TimingLang/CustomListener/errorLisener';
+// import TimingLangLexer from './antrl/dsl/TimingLang/TimingLangLexer';
+// import TimingLangParser from './antrl/dsl/TimingLang/TimingLangParser';
+// import { TimingBlockVisitor } from './antrl/dsl/TimingLang/CustomVisitors/BlockVisitors';
+// import { LspErrorListener } from './antrl/dsl/TimingLang/CustomListener/errorLisener';
 import { CharStream, CommonTokenStream } from 'antlr4';
+import TimingBlockLexer from './antrl/grammar/generate/grammar/TimingBlockLexer';
+import TimingBlockParser from './antrl/grammar/generate/grammar/TimingBlockParser';
+import { LspErrorListener } from './antrl/grammar/listeners/errorLisener';
+import { TimingBlocksVisitor } from './antrl/grammar/visitors/BlockVisitors';
 
 
 // Create a connection for the server, using Node's IPC as a transport.
@@ -376,17 +380,25 @@ async function validateTextContent(text: string, filePath: string): Promise<Diag
   //   });
   // }
   if(filePath.endsWith('.tim')){
-    const chars = new CharStream(text);
-        const lexer = new TimingLangLexer(chars);
+        // const chars = new CharStream(text);
+        // const lexer = new TimingLangLexer(chars);
+        // const tokens = new CommonTokenStream(lexer);
+        // const parser = new TimingLangParser(tokens);
+        //  parser.removeErrorListeners()
+        // const lspListener = new LspErrorListener()
+        // parser.addErrorListener(lspListener)
+
+        const chars = new CharStream(text);
+        const lexer = new TimingBlockLexer(chars);
         const tokens = new CommonTokenStream(lexer);
-        const parser = new TimingLangParser(tokens);
+        const parser = new TimingBlockParser(tokens);
          parser.removeErrorListeners()
         const lspListener = new LspErrorListener()
         parser.addErrorListener(lspListener)
         
         let tree;
         try {
-          tree = parser.timingsBlock();
+          tree = parser.timingBlock();
         } catch {
           return [];
         }
@@ -457,22 +469,28 @@ connection.onCompletion(
        const offset = doc?.offsetAt(_textDocumentPosition.position);
 			// 解析语法树
       if(text){
-        const chars = new CharStream(text);
-        const lexer = new TimingLangLexer(chars);
-        const tokens = new CommonTokenStream(lexer);
-        const parser = new TimingLangParser(tokens);
+        // const chars = new CharStream(text);
+        // const lexer = new TimingLangLexer(chars);
+        // const tokens = new CommonTokenStream(lexer);
+        // const parser = new TimingLangParser(tokens);
 
         //  parser.removeErrorListeners()
         // const lspListener = new LspErrorListener()
         // parser.addErrorListener(lspListener)
+
+        const chars = new CharStream(text);
+        const lexer = new TimingBlockLexer(chars);
+        const tokens = new CommonTokenStream(lexer);
+        const parser = new TimingBlockParser(tokens);
+
         
         let tree;
         try {
-          tree = parser.timingsBlock();
+          tree = parser.timingBlock();
         } catch {
           return [];
         }
-        const visitor = new TimingBlockVisitor();
+        const visitor = new TimingBlocksVisitor();
         const result = visitor.visit(tree)
         // const result = tree.accept(visitor)
         console.log('result',result);
@@ -486,19 +504,32 @@ connection.onCompletion(
 
         if (block) {
           console.log("光标在块:", block.name, "范围:", block.start, "-", block.stop);
-          if(block.name==='TimingsBlock'){
+          if(block.name==='TimingBlock'){
+            // 已存在的块
+            const existing = new Set(result.map((b:any) => b));
+
+            const candidates = ["WaveformTables", "EquationSets", "SpecificationSets"];
+
+            return candidates
+              .filter((b) => !existing.has(b))
+              .map((b) => ({
+                label: b,
+                kind: CompletionItemKind.Snippet,
+                insertText: `${b} {\n    \${0}\n}`,
+                insertTextFormat: InsertTextFormat.Snippet,
+            }));
 
           }
           if(block.name==='WaveformTablesBlock'){
             return [
+           
               {
-            
-              label: "WaveformTableBlock",
-              kind: CompletionItemKind.Snippet,
-              insertText: `WaveformTable {\n  $1\n}`,
-              insertTextFormat: InsertTextFormat.Snippet
-            }
-
+                label: "WaveformTableDefault",
+                kind: CompletionItemKind.Snippet,
+                insertText: `WaveformTable \${1:default} [\${2:x1}] {\n  \${0}\n}`,
+                insertTextFormat: InsertTextFormat.Snippet,
+                detail: "Insert WaveformTable block with default [x1]"
+              }
               
             ]
             
@@ -510,26 +541,45 @@ connection.onCompletion(
           if(block.name==='SpecificationSetsBlock'){
             
           }
-           if(block.name==='WaveformTable'){
-
+           if(block.name==='WaveformTableBlock'){
+          
             return [
               {
-                  label: "Signal Block",
+                  label: "Signal Default",
                   kind: CompletionItemKind.Snippet,
                   detail: "Insert a Signal block",
                   insertTextFormat: InsertTextFormat.Snippet,
-                  insertText: `Signal \${1:Testxxx} {\n  0:d1:D1 d2:D2 t1:T1 \n}`,
-              }
+                  insertText: `Signal \${1:Testxxx} {\n  0:d1:D; \n  1:d1:U; \n  Z:d1:Z; \n  L:d1:Z r1:L; \n  H:d1:Z r1:H; \n  X:d1:Z r1:X;\n}`,
+              },
+               {
+                  label: "Signal",
+                  kind: CompletionItemKind.Snippet,
+                  detail: "Insert a Signal block",
+                  insertTextFormat: InsertTextFormat.Snippet,
+                  insertText: `Signal`,
+              },
             ]
             
           }
-          if(block.name==='Signal'){
+          if(block.name==='WaveformTableBlockItem'){
+                 if(isSignalIDENT(tokens, offset)){
+               return [
+                    {
+                      label: "SignalBlock",
+                      kind: CompletionItemKind.Snippet,
+                      insertText: `\${1:testSignal} {\n  $0\n}`,
+                      insertTextFormat: InsertTextFormat.Snippet,
+                      detail: "Insert a Signal block",
+                    },
+                  ];
+
+            }
              const doc = documents.get(_textDocumentPosition.textDocument.uri);
               const lineText = doc?.getText({
-            start: { line: _textDocumentPosition.position.line, character: 0 },
-            end: _textDocumentPosition.position
-          }).trim();
-           const line = (lineText ?? "").trim();
+                start: { line: _textDocumentPosition.position.line, character: 0 },
+                end: _textDocumentPosition.position
+              }).trim();
+              const line = (lineText ?? "").trim();
 
                       // case1: 空行 → 返回 0-9
             if (line === "") {
@@ -557,7 +607,7 @@ connection.onCompletion(
             // case3: "<digit>:" → 补 d1-d4
             const digitColon = /^\d+:$/;
             if (digitColon.test(line)) {
-              return ["d1", "d2", "d3", "d4"].map(v => ({
+              return ["d1", "d2", "d3", "d4","r1","r2","r3","r4"].map(v => ({
                 label: v,
                 kind: CompletionItemKind.Value
               }));
@@ -580,35 +630,25 @@ connection.onCompletion(
             // case5: "<digit>:d<digit>:" → 补 D1-D9
             const dWithColon = /^\d+:d\d:$/;
             if (dWithColon.test(line)) {
-              return Array.from({ length: 9 }, (_, i) => ({
-                label: `D${i + 1}`,
-                kind: CompletionItemKind.Value
-              }));
+              return ["D0", "D1", "D", "DN","U0","U1","UN","Z","P","N"].map(v => ({
+                  label: v,
+                  kind: CompletionItemKind.Value
+                }));
             }
 
             
           }
         } else {
           console.log("光标不在任何块内");
+          return []
         }
 
-        const timingsStart = tree.start.start;
-        const timingsEnd = tree.stop?.stop ?? tree.start.start;
-        if(offset){
-          if (offset < timingsStart || offset > timingsEnd) return [];
-        }
-        // 已存在的块
-        const existing = new Set(result.map((b:any) => b));
-
-        const candidates = ["WaveformTables", "EquationSets", "SpecificationSets"];
-
-        return candidates
-          .filter((b) => !existing.has(b))
-          .map((b) => ({
-            label: b,
-            kind: CompletionItemKind.Snippet,
-            insertText: `${b} {\n    \n}`,
-        }));
+        // const timingsStart = tree.start.start;
+        // const timingsEnd = tree.stop?.stop ?? tree.start.start;
+        // if(offset){
+        //   if (offset < timingsStart || offset > timingsEnd) return [];
+        // }
+        
 
       }
          
@@ -650,6 +690,22 @@ function findBlockAtPosition(ctx:any, pos:any):any {
     start: startIndex,
     stop: stopIndex,
   };
+}
+
+// 是否在Signal地方
+function isSignalIDENT(tokenStream: any, offset: any): boolean{
+  const tokens = tokenStream.tokens
+
+  
+  const tokenIndex = tokenStream.tokens.findIndex(
+    (t:any) => t.start <= offset && offset <= t.stop + 2
+  );
+  const currentToken = tokenStream.get(tokenIndex);
+  if (currentToken?.text === "Signal") {
+    return true
+  }
+  return false
+
 }
 
 

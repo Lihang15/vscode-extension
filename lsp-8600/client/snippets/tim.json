@@ -1,7 +1,7 @@
 {
   
-  "Timings Block": {
-    "prefix": "timings",
+  "Timings template": {
+    "prefix": "Timings_template",
     "body": [
       "Timings {",
       "\tWaveformTables {",
@@ -172,8 +172,17 @@
       "\t}",
       "}"
     ],
-    "description": "Insert complete Timings block",
+    "description": "Insert complete Timings block template",
     "scope": "tim"
+  },
+  "Timings":{
+    "prefix":"Timings",
+     "body": [
+      "Timings {",
+           "  $0",
+         "}"
+     ],
+      "description": "Insert complete Timings block"
   }
 
 
