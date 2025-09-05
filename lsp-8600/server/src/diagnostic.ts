@@ -20,6 +20,7 @@ import {
 import { URI } from 'vscode-uri';
 import * as fs from 'fs';
 import * as path from 'path';
+
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
@@ -246,6 +247,9 @@ documents.onDidChangeContent(change => {
 	.then(diagnostics => {
 	  connection.sendDiagnostics({ uri: change.document.uri, diagnostics });
 	});
+
+
+
 });
 
 

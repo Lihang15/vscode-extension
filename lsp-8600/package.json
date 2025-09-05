@@ -9,8 +9,10 @@
 		"url": "https://github.com/Microsoft/vscode-extension-samples"
 	},
 	"publisher": "lihang",
-    "icon": "client/icons/芯片.png",
-	"categories": ["Snippets"],
+	"icon": "client/icons/芯片.png",
+	"categories": [
+		"Snippets"
+	],
 	"keywords": [
 		"multi-root ready"
 	],
@@ -22,7 +24,6 @@
 		"onLanguage:tim"
 	],
 	"main": "./client/out/extension",
-
 	"contributes": {
 		"languages": [
 			{

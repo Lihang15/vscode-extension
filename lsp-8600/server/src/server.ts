@@ -25,7 +25,9 @@ import {
 	Location,
 	InlayHint,
 	InlayHintKind,
-	Position
+	Position,
+  InsertTextFormat,
+  TextEdit
 } from 'vscode-languageserver/node';
 
 import {
@@ -34,6 +36,14 @@ import {
 import { URI } from 'vscode-uri';
 import * as fs from 'fs';
 import * as path from 'path';
+// import { CharStream, CommonTokenStream, ParseTreeWalker }  from 'antlr4';
+import TimingLangLexer from './antrl/dsl/TimingLang/TimingLangLexer';
+import TimingLangParser from './antrl/dsl/TimingLang/TimingLangParser';
+import { TimingBlockVisitor } from './antrl/dsl/TimingLang/CustomVisitors/BlockVisitors';
+import { LspErrorListener } from './antrl/dsl/TimingLang/CustomListener/errorLisener';
+import { CharStream, CommonTokenStream } from 'antlr4';
+
+
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
@@ -70,8 +80,8 @@ connection.onInitialize((params: InitializeParams) => {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			// Tell the client that this server supports code completion.
 			completionProvider: {
-				resolveProvider: true,
-				triggerCharacters: [' ']
+				// resolveProvider: true,
+				// triggerCharacters: ['ctrl'+ ' ']
 			},
 			inlayHintProvider: true,
 			hoverProvider: true,
@@ -302,11 +312,12 @@ async function validateTextContent(text: string, filePath: string): Promise<Diag
   let match: RegExpExecArray | null;
   while ((match = dPattern.exec(text))) {
     diagnostics.push({
-      severity: DiagnosticSeverity.Information,
+      severity: DiagnosticSeverity.Error,
       range: {
         start: { line: text.substr(0, match.index).split('\n').length - 1, character: match.index },
         end: { line: text.substr(0, match.index).split('\n').length - 1, character: match.index + match[0].length }
       },
+      data: {error:['d11']},
       message: `${match[0]} matched pattern d+number.`,
       source: 'PatternCheck'
     });
@@ -329,41 +340,66 @@ async function validateTextContent(text: string, filePath: string): Promise<Diag
   }
 
   // 检查括号匹配
-  const bracketPairs: { [open: string]: string } = { '{': '}', '[': ']', '(': ')' };
-  const openStack: { char: string; index: number }[] = [];
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    if (char in bracketPairs) {
-      openStack.push({ char, index: i });
-    } else if (Object.values(bracketPairs).includes(char)) {
-      const expectedOpen = Object.keys(bracketPairs).find(k => bracketPairs[k] === char);
-      const last = openStack.pop();
-      if (!last || last.char !== expectedOpen) {
-        diagnostics.push({
-          severity: DiagnosticSeverity.Error,
-          range: {
-            start: { line: text.substr(0, i).split('\n').length - 1, character: i },
-            end: { line: text.substr(0, i).split('\n').length - 1, character: i + 1 }
-          },
-          message: `Unmatched closing '${char}'`,
-          source: 'BracketCheck'
-        });
-      }
-    }
-  }
+  // const bracketPairs: { [open: string]: string } = { '{': '}', '[': ']', '(': ')' };
+  // const openStack: { char: string; index: number }[] = [];
+  // for (let i = 0; i < text.length; i++) {
+  //   const char = text[i];
+  //   if (char in bracketPairs) {
+  //     openStack.push({ char, index: i });
+  //   } else if (Object.values(bracketPairs).includes(char)) {
+  //     const expectedOpen = Object.keys(bracketPairs).find(k => bracketPairs[k] === char);
+  //     const last = openStack.pop();
+  //     if (!last || last.char !== expectedOpen) {
+  //       diagnostics.push({
+  //         severity: DiagnosticSeverity.Error,
+  //         range: {
+  //           start: { line: text.substr(0, i).split('\n').length - 1, character: i },
+  //           end: { line: text.substr(0, i).split('\n').length - 1, character: i + 1 }
+  //         },
+  //         message: `Unmatched closing '${char}'`,
+  //         source: 'BracketCheck'
+  //       });
+  //     }
+  //   }
+  // }
 
-  // 剩余未闭合
-  for (const unclosed of openStack) {
-    diagnostics.push({
-      severity: DiagnosticSeverity.Error,
-      range: {
-        start: { line: text.substr(0, unclosed.index).split('\n').length - 1, character: unclosed.index },
-        end: { line: text.substr(0, unclosed.index).split('\n').length - 1, character: unclosed.index + 1 }
-      },
-      message: `Unmatched opening '${unclosed.char}'`,
-      source: 'BracketCheck'
-    });
+  // // 剩余未闭合
+  // for (const unclosed of openStack) {
+  //   diagnostics.push({
+  //     severity: DiagnosticSeverity.Error,
+  //     range: {
+  //       start: { line: text.substr(0, unclosed.index).split('\n').length - 1, character: unclosed.index },
+  //       end: { line: text.substr(0, unclosed.index).split('\n').length - 1, character: unclosed.index + 1 }
+  //     },
+  //     message: `Unmatched opening '${unclosed.char}'`,
+  //     source: 'BracketCheck'
+  //   });
+  // }
+  if(filePath.endsWith('.tim')){
+    const chars = new CharStream(text);
+        const lexer = new TimingLangLexer(chars);
+        const tokens = new CommonTokenStream(lexer);
+        const parser = new TimingLangParser(tokens);
+         parser.removeErrorListeners()
+        const lspListener = new LspErrorListener()
+        parser.addErrorListener(lspListener)
+        
+        let tree;
+        try {
+          tree = parser.timingsBlock();
+        } catch {
+          return [];
+        }
+       
+        
+        console.log('error',lspListener.diagnostics);
+        for(const error of  lspListener.diagnostics){
+           diagnostics.push(error)
+        }
+       
+
   }
+     
 
   return diagnostics;
 }
@@ -375,7 +411,24 @@ documents.onDidChangeContent(change => {
     .then(diagnostics => {
       connection.sendDiagnostics({ uri: change.document.uri, diagnostics });
     });
+
+//     	const input = `
+// Timings {
+//   WaveformTables { signal1; signal2; }
+//   EquationSets { eq1 = a + b; }
+// }
+// `;
+// const chars = new CharStream(input);
+// const lexer = new TimingLangLexer(chars);
+// const tokens = new CommonTokenStream(lexer);
+// const parser = new TimingLangParser(tokens);
+
+// const tree = parser.timingFile();
+
+// console.log(tree);
 });
+
+
 
 connection.onDidChangeWatchedFiles(_change => {
 	// Monitored files have change in VSCode
@@ -384,7 +437,7 @@ connection.onDidChangeWatchedFiles(_change => {
 
 // This handler provides the initial list of the completion items.
 connection.onCompletion(
-	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] | any => {
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.
@@ -400,40 +453,205 @@ connection.onCompletion(
 			{ label: 'a3',kind: CompletionItemKind.Text,data:3 }
 			];
 		}else{
-			return [
-			{
-				label: 'VDD_DDR_0P75',
-				kind: CompletionItemKind.Text,
-				data: 1
-			},
-			{
-				label: 'VDD_ECSERDES_0P75',
-				kind: CompletionItemKind.Text,
-				data: 2
-			},
-			{
-				label: 'VDDH_SERDES_1P8',
-				kind: CompletionItemKind.Text,
-				data: 3
-			},
-			{
-				label: 'VDDIO_1_1P8',
-				kind: CompletionItemKind.Text,
-				data: 4
-			},
-			{
-				label: 'lihang',
-				kind: CompletionItemKind.Text,
-				data: 5
-			},
-			
-		];
-			
+			 const text = doc?.getText();
+       const offset = doc?.offsetAt(_textDocumentPosition.position);
+			// 解析语法树
+      if(text){
+        const chars = new CharStream(text);
+        const lexer = new TimingLangLexer(chars);
+        const tokens = new CommonTokenStream(lexer);
+        const parser = new TimingLangParser(tokens);
+
+        //  parser.removeErrorListeners()
+        // const lspListener = new LspErrorListener()
+        // parser.addErrorListener(lspListener)
+        
+        let tree;
+        try {
+          tree = parser.timingsBlock();
+        } catch {
+          return [];
+        }
+        const visitor = new TimingBlockVisitor();
+        const result = visitor.visit(tree)
+        // const result = tree.accept(visitor)
+        console.log('result',result);
+        // console.log('result',visitor.blocks);
+       
+        
+        // console.log('error',lspListener.diagnostics);
+        
+
+        const block = findBlockAtPosition(tree, offset);
+
+        if (block) {
+          console.log("光标在块:", block.name, "范围:", block.start, "-", block.stop);
+          if(block.name==='TimingsBlock'){
+
+          }
+          if(block.name==='WaveformTablesBlock'){
+            return [
+              {
+            
+              label: "WaveformTableBlock",
+              kind: CompletionItemKind.Snippet,
+              insertText: `WaveformTable {\n  $1\n}`,
+              insertTextFormat: InsertTextFormat.Snippet
+            }
+
+              
+            ]
+            
+
+          }
+          if(block.name==='EquationSetsBlock'){
+            
+          }
+          if(block.name==='SpecificationSetsBlock'){
+            
+          }
+           if(block.name==='WaveformTable'){
+
+            return [
+              {
+                  label: "Signal Block",
+                  kind: CompletionItemKind.Snippet,
+                  detail: "Insert a Signal block",
+                  insertTextFormat: InsertTextFormat.Snippet,
+                  insertText: `Signal \${1:Testxxx} {\n  0:d1:D1 d2:D2 t1:T1 \n}`,
+              }
+            ]
+            
+          }
+          if(block.name==='Signal'){
+             const doc = documents.get(_textDocumentPosition.textDocument.uri);
+              const lineText = doc?.getText({
+            start: { line: _textDocumentPosition.position.line, character: 0 },
+            end: _textDocumentPosition.position
+          }).trim();
+           const line = (lineText ?? "").trim();
+
+                      // case1: 空行 → 返回 0-9
+            if (line === "") {
+              return Array.from({ length: 10 }, (_, i) => ({
+                label: i.toString(),
+                kind: CompletionItemKind.Value
+              }));
+            }
+
+
+            // case2: 单个数字 → 补 ":"
+            const onlyDigit = /^\d+$/;
+            if (onlyDigit.test(line)) {
+              return [{
+                label: ":",
+                kind: CompletionItemKind.Operator,
+                insertText: ":",
+                insertTextFormat: InsertTextFormat.PlainText,
+                textEdit: TextEdit.insert(_textDocumentPosition.position, ':'),
+                // 重要：将 filterText 设为当前前缀，避免被客户端过滤
+                filterText: line
+              }];
+            }
+
+            // case3: "<digit>:" → 补 d1-d4
+            const digitColon = /^\d+:$/;
+            if (digitColon.test(line)) {
+              return ["d1", "d2", "d3", "d4"].map(v => ({
+                label: v,
+                kind: CompletionItemKind.Value
+              }));
+            }
+
+            // case4: "<digit>:d<digit>" → 补 ":"
+            const dPattern = /^\d+:d\d$/;
+            if (dPattern.test(line)) {
+              return [{
+                label: ":",
+                kind: CompletionItemKind.Operator,
+                 insertText: ":",
+                insertTextFormat: InsertTextFormat.PlainText,
+                textEdit: TextEdit.insert(_textDocumentPosition.position, ':'),
+                // 重要：将 filterText 设为当前前缀，避免被客户端过滤
+                filterText: line
+              }];
+            }
+
+            // case5: "<digit>:d<digit>:" → 补 D1-D9
+            const dWithColon = /^\d+:d\d:$/;
+            if (dWithColon.test(line)) {
+              return Array.from({ length: 9 }, (_, i) => ({
+                label: `D${i + 1}`,
+                kind: CompletionItemKind.Value
+              }));
+            }
+
+            
+          }
+        } else {
+          console.log("光标不在任何块内");
+        }
+
+        const timingsStart = tree.start.start;
+        const timingsEnd = tree.stop?.stop ?? tree.start.start;
+        if(offset){
+          if (offset < timingsStart || offset > timingsEnd) return [];
+        }
+        // 已存在的块
+        const existing = new Set(result.map((b:any) => b));
+
+        const candidates = ["WaveformTables", "EquationSets", "SpecificationSets"];
+
+        return candidates
+          .filter((b) => !existing.has(b))
+          .map((b) => ({
+            label: b,
+            kind: CompletionItemKind.Snippet,
+            insertText: `${b} {\n    \n}`,
+        }));
+
+      }
+         
 		}
 		
 		
 	}
 );
+
+function findBlockAtPosition(ctx:any, pos:any):any {
+  if (!ctx || !ctx.start || !ctx.stop) return null;
+
+  const startIndex = ctx.start.start;
+  const stopIndex = ctx.stop.stop;
+
+  // 光标不在范围内
+  if (pos < startIndex || pos > stopIndex) {
+    return null;
+  }
+
+  // 递归孩子，优先找更深的
+  if (ctx.children) {
+    for (const child of ctx.children) {
+      if (child.constructor && child.start && child.stop) {
+        const inside = findBlockAtPosition(child, pos);
+        if (inside) return inside;
+      }
+    }
+  }
+
+  // 拿到 rule 名字：去掉 Context 后缀
+  const className = ctx.constructor.name; // e.g. WaveformTableContext
+  const ruleName = className.endsWith("Context")
+    ? className.substring(0, className.length - "Context".length)
+    : className;
+
+  return {
+    name: ruleName, // 比如 "WaveformTable"
+    start: startIndex,
+    stop: stopIndex,
+  };
+}
+
 
 // This handler resolves additional information for the item selected in
 // the completion list.
